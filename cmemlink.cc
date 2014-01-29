@@ -7,8 +7,11 @@
 #include "ofstream.h"
 #include "strmsize.h"
 #include "ualgo.h"
+#include "unew.h"
 
 namespace ustl {
+
+extern std::new_handler __get_new_handler(void) noexcept;
 
 /// \brief Attaches the object to pointer \p p of size \p n.
 ///
@@ -18,7 +21,8 @@ namespace ustl {
 void cmemlink::link (const void* p, size_type n)
 {
     if (!p && n)
-	throw bad_alloc (n);
+        (::ustl::__get_new_handler ()) ();
+
     unlink();
     relink (p, n);
 }
