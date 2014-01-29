@@ -14,6 +14,15 @@ inline void nfree (void* p) noexcept { if (p) free (p); }
 
 #if WITHOUT_LIBSTDCPP
 
+namespace std {
+    typedef void (*new_handler)(void);
+
+    new_handler set_new_handler(new_handler hdl) noexcept;
+#if HAVE_CPP11
+    new_handler get_new_handler(void) noexcept;
+#endif
+}
+
 //
 // These are replaceable signatures:
 //  - normal single new and delete (no arguments, throw @c bad_alloc on error)
