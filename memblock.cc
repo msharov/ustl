@@ -12,6 +12,8 @@
 
 namespace ustl {
 
+extern std::new_handler __get_new_handler(void) noexcept;
+
 memblock::memblock (void) noexcept		: memlink (), m_Capacity (0) { }
 memblock::memblock (const void* p, size_type n) : memlink (), m_Capacity (0) { assign (p, n); }
 memblock::memblock (size_type n)		: memlink (), m_Capacity (0) { resize (n); }
@@ -91,10 +93,15 @@ void memblock::reserve (size_type newSize, bool bExact)
     const size_t alignedSize (NextPow2 (newSize));
     if (!bExact)
 	newSize = alignedSize;
-    pointer newBlock = (pointer) realloc (oldBlock, newSize);
-    if (!newBlock)
-	throw bad_alloc (newSize);
-    if (!oldBlock & (cdata() != NULL))
+
+    pointer newBlock;
+    do {
+        newBlock = (pointer) realloc (oldBlock, newSize);
+        if (!newBlock)
+	    (::ustl::__get_new_handler ()) ();
+    } while (!newBlock);
+
+    if (!oldBlock && (cdata() != NULL))
 	copy_n (cdata(), min (size() + 1, newSize), newBlock);
     link (newBlock, size());
     m_Capacity = newSize;
@@ -105,9 +112,14 @@ void memblock::shrink_to_fit (void)
 {
     if (is_linked())
 	return;
-    pointer newBlock = (pointer) realloc (begin(), size());
-    if (!newBlock && size())
-	throw bad_alloc (size());
+
+    pointer newBlock;
+    do {
+        newBlock = (pointer) realloc (begin(), size());
+        if (!newBlock && size())
+            (::ustl::__get_new_handler ()) ();
+    } while (!newBlock && size());
+
     m_Capacity = size();
     memlink::relink (newBlock, size());
 }
