@@ -49,7 +49,12 @@ bvt/clean:
 	    rm -f ${bvt/BVTS} ${bvt/OBJS} ${bvt/DEPS} bvt/bench $Obvt/bench.o $Obvt/stdtest.o;\
 	    rmdir $Obvt;\
 	fi
+ifndef CROSS_COMPILE
 check:		bvt/run
+else
+$(warning Cross compiling; cannot run check. Will build check script to run in target environment.)
+check:		${bvt/BVTS}
+endif
 bvt/check:	check
 
 ${bvt/OBJS} $Obvt/stdtest.o $Obvt/bench.o: Makefile bvt/Module.mk Config.mk ${NAME}/config.h
