@@ -62,7 +62,7 @@ stdlib.h string.h time.h unistd.h math.h stdlib.h sys/mman.h execinfo.h";
 LIBS="supc++ gcc_eh SystemStubs"
 
 # First pair is used if nothing matches
-PROGS="CC=gcc CC=clang CC=cc CXX=g++ CXX=clang++ CXX=c++ DOXYGEN=doxygen LD=ld AR=ar RANLIB=ranlib RANLIB=touch INSTALL=install"
+PROGS="CC=${CROSS_COMPILE}gcc CC=${CROSS_COMPILE}clang CC=${CROSS_COMPILE}cc CXX=${CROSS_COMPILE}g++ CXX=${CROSS_COMPILE}clang++ CXX=${CROSS_COMPILE}c++ DOXYGEN=doxygen LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar RANLIB=${CROSS_COMPILE}ranlib RANLIB=touch INSTALL=install"
 
 # Environment variables
 ENVIRONS="CXXFLAGS LDFLAGS"
@@ -88,16 +88,29 @@ s/@PKG_MINOR@/$PKG_MINOR/g"
 #### The rest of the file is configuration code. Leave it alone. #####
 ######################################################################
 
-die() { rm -f config.sed config.cpu config.cpu.c; exit; }
+die() { [ -n "$1" ] && echo "$1" > /dev/stderr; rm -f config.sed config.cpu config.cpu.c; exit 99; }
+
+#### Check for cross-compiling target ########
+# Can't use the --build-host options because they are parsed too late!
+if [ -n "${USTL_CROSS_COMPILE}" ]; then
+    echo Cross-compiling for ${USTL_CROSS_COMPILE}, based on USTL_CROSS_COMPILE environment variable.
+    if [ -e cross_targets/${USTL_CROSS_COMPILE}.sh ]; then
+        source cross_targets/${USTL_CROSS_COMPILE}.sh
+    else
+        die "Could not find shell script to import in cross_targets subdirectory for target \"${USTL_CROSS_COMPILE}\""
+    fi
+    [ ! -e cross_targets/${USTL_CROSS_COMPILE}.sed ] && die "Could not find sed script in cross_targets subdirectory for target \"${USTL_CROSS_COMPILE}\""
+    [ -z "${CROSS_COMPILE}" ] && die "cross_targets/${USTL_CROSS_COMPILE}.sh did not define the cross-compiler prefix!"
+fi
 
 #### Compile the configurator and generate initial config.sed ########
 
 if [ -z "$CC" ]; then
     for i in gcc g++ cc c++ c89 c99; do
-	CC=`which $i 2>/dev/null` && break
+	CC=`which ${CROSS_COMPILE}$i 2>/dev/null` && break
     done
 fi
-[ -z "$CC" ] && "No C compiler found" && die
+[ -z "$CC" ] && die "No C compiler found"
 
 # Determine gcc private directory
 PSTDDEF=`echo "#include <stddef.h>"|$CC -E -|grep stddef.h|head -n1|cut -d' ' -f3|cut -d'"' -f2`
@@ -105,6 +118,7 @@ PINCDIR=`dirname $PSTDDEF`
 PLIBDIR=`dirname $PINCDIR`
 if [ -d $PLIBDIR/lib ]; then PLIBDIR=$PLIBDIR/lib; fi
 
+if [ -z "${CROSS_COMPILE}" ]; then
 # Create and build the C configurator
 cat>config.cpu.c<<\SRC
 #include <stdio.h>
@@ -249,6 +263,9 @@ SRC
 $CC -o config.cpu config.cpu.c
 [ ! -x config.cpu ] && echo "Configurator build failed" && die
 ./config.cpu > config.sed
+else # Cross compiling
+    cp cross_targets/${USTL_CROSS_COMPILE}.sed config.sed
+fi
 
 #### Set host-dependent options ######################################
 
@@ -347,7 +364,8 @@ Installation directories:
   --gccincludedir=DIR	GCC internal header files [PREFIX/include]
   --infodir=DIR		info documentation [PREFIX/info]
   --mandir=DIR		man documentation [PREFIX/man]
-
+"
+unused="
 System types:
   --build=BUILD		configure for building on BUILD [guessed]
   --host=HOST		cross-compile to build programs to run on HOST [BUILD]
@@ -464,7 +482,7 @@ for i in $PROGS; do
     # First check if an environment variable is set
     [ ! -z "$esciv" ] && echo "s/@$pname@/$esciv/g" >>config.sed
     # Check if the program exists
-    [ -x `which $pcall 2>/dev/null` ] && echo "s/@$pname@/$pcall/g" >>config.sed
+    [ -x `which ${CROSS_COMPILE}$pcall 2>/dev/null` ] && echo "s/@$pname@/${CROSS_COMPILE}$pcall/g" >>config.sed
 done
 # If nothing found in first loop, set the first pair anyway.
 for i in $PROGS; do
@@ -479,6 +497,7 @@ for i in $ENVIRONS; do
     echo "s/ \?@$i@/$esciv/g" >>config.sed
 done
 echo "$CUSTSUBS" >>config.sed
+echo "s/@CROSS_COMPILE@/${CROSS_COMPILE}/g" >> config.sed
 }
 SubHeadLibsProgs
 

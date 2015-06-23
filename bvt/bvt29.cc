@@ -280,7 +280,11 @@ static void TestTypeTraits (void)
 static void TestTypeTraits (void)
 {
     memblock outbuf;
-    outbuf.read_file ("bvt/bvt29.std");
+    try {
+      outbuf.read_file ("bvt/bvt29.std");
+    } catch (...) {
+      outbuf.read_file ("bvt29.std");
+    }
     cout << outbuf;
 }
 

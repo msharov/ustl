@@ -8,6 +8,7 @@ MINOR		:= @PKG_MINOR@
 BUILD_SHARED	:= 1
 #BUILD_STATIC	:= 1
 NOLIBSTDCPP	:= 1
+CROSS_COMPILE   := @CROSS_COMPILE@
 
 ################ Programs ############################################
 
