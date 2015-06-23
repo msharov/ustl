@@ -30,7 +30,7 @@ bvt/run:	${bvt/BVTS}
 	@for i in ${bvt/BVTS}; do \
 	    echo "Running $$i"; \
 	    ./$$i < $$i.cc &> $$i.out; \
-	    diff $$i.std $$i.out && rm -f $$i.out; \
+	    diff -s $$i.std $$i.out && rm -f $$i.out; \
 	done
 
 ${bvt/BVTS}: bvt/%: $Obvt/%.o $Obvt/stdtest.o ${ALLTGTS}
