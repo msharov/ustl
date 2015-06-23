@@ -364,7 +364,8 @@ Installation directories:
   --gccincludedir=DIR	GCC internal header files [PREFIX/include]
   --infodir=DIR		info documentation [PREFIX/info]
   --mandir=DIR		man documentation [PREFIX/man]
-
+"
+unused="
 System types:
   --build=BUILD		configure for building on BUILD [guessed]
   --host=HOST		cross-compile to build programs to run on HOST [BUILD]
