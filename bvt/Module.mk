@@ -1,6 +1,6 @@
 ################ Source files ##########################################
 
-bvt/SRCS	:= $(wildcard bvt/bvt*.cc)
+bvt/SRCS	:= $(sort $(wildcard bvt/bvt*.cc))
 bvt/BVTS	:= $(bvt/SRCS:.cc=)
 bvt/OBJS	:= $(addprefix $O,$(bvt/SRCS:.cc=.o))
 ifdef BUILD_STATIC
@@ -52,8 +52,10 @@ bvt/clean:
 ifndef CROSS_COMPILE
 check:		bvt/run
 else
-$(warning Cross compiling; cannot run check. Will build check script to run in target environment.)
+check: LAST_TEST=$(patsubst bvt/bvt%,%,$(lastword $(bvt/BVTS)))
 check:		${bvt/BVTS}
+	@echo To test, copy the source tree to the target machine, and then run from the bvt subdirectory:
+	@echo 'for i in bvt$$(seq -w -s" bvt" 0 $(LAST_TEST)); do echo Test $$i; LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:../.o/ ./$${i} < $${i}.cc &> $${i}.out; diff -us $${i}.{std,out}; done'
 endif
 bvt/check:	check
 
