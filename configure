@@ -447,7 +447,7 @@ fi
 
 SubHeadLibsProgs() {
 local INCPATH LIBPATH LIBSUFFIX found pname pcall esciv
-INCPATH="$ac_var_oldincludedir $ac_var_includedir $ac_var_gccincludedir $ac_var_customincdir /usr/include /usr/include/x86_64-linux-gnu"
+INCPATH="$ac_var_oldincludedir $ac_var_includedir $ac_var_gccincludedir $ac_var_customincdir /usr/include"
 INCPATH=`echo $INCPATH | sed 's/\\\\//g'`
 for i in $HEADERS; do
     for p in $INCPATH; do
@@ -458,7 +458,7 @@ for i in $HEADERS; do
     done
 done
 
-LIBPATH="`echo $LD_LIBRARY_PATH | tr ':' ' '` $ac_var_libdir $ac_var_gcclibdir $ac_var_customlibdir /usr/lib /usr/local/lib /lib /usr/lib/x86_64-linux-gnu"
+LIBPATH="`echo $LD_LIBRARY_PATH | tr ':' ' '` $ac_var_libdir $ac_var_gcclibdir $ac_var_customlibdir /lib /usr/lib /usr/local/lib"
 LIBPATH=`echo $LIBPATH | sed 's/\\\\//g'`
 LIBSUFFIX="so a la dylib"
 for i in $LIBS; do
