@@ -88,7 +88,7 @@ s/@PKG_MINOR@/$PKG_MINOR/g"
 #### The rest of the file is configuration code. Leave it alone. #####
 ######################################################################
 
-die() { [ -n "$1" ] && echo "$1" > /dev/stderr; rm -f config.ssed config.cpu config.cpu.c; exit 99; }
+die() { [ -n "$1" ] && echo "$1" > /dev/stderr; rm -f config.sed config.cpu config.cpu.c; exit 99; }
 
 #### Check for cross-compiling target ########
 # Can't use the --build-host options because they are parsed too late!
