@@ -2,8 +2,9 @@ Cross-compiling is in "alpha" stage - it has been tested by one person on one pl
 
 1. Extract "config.cpu.c" from configure and cross-compile manually.
 2. Take its output, combined with equivalent to any other --with commands your platform needs, and put them in cross_targets/YOURPLATFORM.sed
-3. Create a new file cross_targets/YOURPLATFORM.sh that exports CROSS_COMPILE=compiler-prefix, e.g.
+3. Create a new file cross_targets/YOURPLATFORM.sh that exports CROSS_COMPILE=/path/compiler-prefix, e.g.
   export CROSS_COMPILE=arm-xilinx-linux-gnueabi-
 will call arm-xilinx-linux-gnueabi-gcc, arm-xilinx-linux-gnueabi-ld, etc.
-4. USTL_CROSS_COMPILE=YOURPLATFORM ./configure
-5. make && make check
+4. Also set up the "base" directory - see "zynq.sh" for an example.
+5. USTL_CROSS_COMPILE=YOURPLATFORM ./configure
+6. make && make check

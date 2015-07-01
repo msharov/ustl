@@ -62,7 +62,7 @@ stdlib.h string.h time.h unistd.h math.h stdlib.h sys/mman.h execinfo.h";
 LIBS="supc++ gcc_eh SystemStubs"
 
 # First pair is used if nothing matches
-PROGS="CC=${CROSS_COMPILE}gcc CC=${CROSS_COMPILE}clang CC=${CROSS_COMPILE}cc CXX=${CROSS_COMPILE}g++ CXX=${CROSS_COMPILE}clang++ CXX=${CROSS_COMPILE}c++ DOXYGEN=doxygen LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar RANLIB=${CROSS_COMPILE}ranlib RANLIB=touch INSTALL=install"
+PROGS="CC=gcc CC=clang CC=cc CXX=g++ CXX=clang++ CXX=c++ DOXYGEN=doxygen LD=ld AR=ar RANLIB=ranlib RANLIB=touch INSTALL=install"
 
 # Environment variables
 ENVIRONS="CXXFLAGS LDFLAGS"
@@ -105,6 +105,8 @@ fi
 
 #### Compile the configurator and generate initial config.sed ########
 
+if [ -z "${CROSS_COMPILE}" ]; then
+
 if [ -z "$CC" ]; then
     for i in gcc g++ cc c++ c89 c99; do
 	CC=`which ${CROSS_COMPILE}$i 2>/dev/null` && break
@@ -118,7 +120,6 @@ PINCDIR=`dirname $PSTDDEF`
 PLIBDIR=`dirname $PINCDIR`
 if [ -d $PLIBDIR/lib ]; then PLIBDIR=$PLIBDIR/lib; fi
 
-if [ -z "${CROSS_COMPILE}" ]; then
 # Create and build the C configurator
 cat>config.cpu.c<<\SRC
 #include <stdio.h>
@@ -448,7 +449,11 @@ fi
 SubHeadLibsProgs() {
 local INCPATH LIBPATH LIBSUFFIX found pname pcall esciv
 INCPATH="$ac_var_oldincludedir $ac_var_includedir $ac_var_gccincludedir $ac_var_customincdir /usr/include"
+if [ -n "${USTL_CROSS_COMPILE}" ]; then
+  INCPATH=`find ${CROSS_COMPILE_BASE} -type d -name include | xargs echo`
+fi
 INCPATH=`echo $INCPATH | sed 's/\\\\//g'`
+
 for i in $HEADERS; do
     for p in $INCPATH; do
 	if [ -r "$p/$i" ]; then
@@ -459,6 +464,9 @@ for i in $HEADERS; do
 done
 
 LIBPATH="`echo $LD_LIBRARY_PATH | tr ':' ' '` $ac_var_libdir $ac_var_gcclibdir $ac_var_customlibdir /lib /usr/lib /usr/local/lib"
+if [ -n "${USTL_CROSS_COMPILE}" ]; then
+  INCPATH=`find ${CROSS_COMPILE_BASE} -type d -name lib | xargs echo`
+fi
 LIBPATH=`echo $LIBPATH | sed 's/\\\\//g'`
 LIBSUFFIX="so a la dylib"
 for i in $LIBS; do
@@ -482,7 +490,7 @@ for i in $PROGS; do
     # First check if an environment variable is set
     [ ! -z "$esciv" ] && echo "s/@$pname@/$esciv/g" >>config.sed
     # Check if the program exists
-    [ -x `which ${CROSS_COMPILE}$pcall 2>/dev/null` ] && echo "s/@$pname@/${CROSS_COMPILE}$pcall/g" >>config.sed
+    [ -n "`which ${CROSS_COMPILE}$pcall 2>/dev/null`" ] && echo "s/@$pname@/$(echo ${CROSS_COMPILE}$pcall | sed 's|/|\\/|g')/g" >>config.sed
 done
 # If nothing found in first loop, set the first pair anyway.
 for i in $PROGS; do
@@ -497,7 +505,7 @@ for i in $ENVIRONS; do
     echo "s/ \?@$i@/$esciv/g" >>config.sed
 done
 echo "$CUSTSUBS" >>config.sed
-echo "s/@CROSS_COMPILE@/${CROSS_COMPILE}/g" >> config.sed
+echo "s/@CROSS_COMPILE@/$(echo ${CROSS_COMPILE} | sed 's|/|\\/|g')/g" >> config.sed
 }
 SubHeadLibsProgs
 

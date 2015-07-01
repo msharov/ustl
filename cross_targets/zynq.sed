@@ -18,7 +18,7 @@ s/#undef \(SIZE_OF_POINTER\)/#define \1 4/g
 s/#undef \(SIZE_OF_SIZE_T\)/#define \1 4/g
 s/#undef \(LSTAT_FOLLOWS_SLASHED_SYMLINK\)/#define \1 1/g
 s/ \?@PROCESSOR_OPTS@/ -O3 -march=armv7-a -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon-fp16 -mvectorize-with-neon-quad/g
-s/#undef \(WANT_NAME_DEMANGLING\)/#define \1 1/g
+# s/#undef \(WANT_NAME_DEMANGLING\)/#define \1 1/g
 s/#define \(WANT_MMX\) 1/#undef \1/g
 s/#undef \(WANT_ALWAYS_INLINE\)/#define \1 1/g
 s/#define \(WITHOUT_LIBSTDCPP\) 1/#undef \1/g
