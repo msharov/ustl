@@ -31,7 +31,7 @@ bvt/run:	${bvt/BVTS}
 	@for i in ${bvt/BVTS}; do	\
 	    BVT="bvt/$$(basename $$i)";	\
 	    echo "Running $$i";		\
-	    ./$$i < $$BVT.cc &> $$i.out;	\
+	    ./$$i < $$BVT.cc > $$i.out 2>&1;	\
 	    diff $$BVT.std $$i.out && rm -f $$i.out; \
 	done
 
