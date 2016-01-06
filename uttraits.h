@@ -115,35 +115,35 @@ template <typename T> using make_unsigned_t = typename make_unsigned<T>::type;
 //}}}-------------------------------------------------------------------
 //{{{ Primary type categories
 
-UNARY_TRAIT_DEFN (__is_void);
-UNARY_TRAIT_TRUE (__is_void, void);
-UNARY_TRAIT_DEFB (is_void, __is_void<remove_cv_t<T>>::value);
+UNARY_TRAIT_DEFN (__ustl_is_void);
+UNARY_TRAIT_TRUE (__ustl_is_void, void);
+UNARY_TRAIT_DEFB (is_void, __ustl_is_void<remove_cv_t<T>>::value);
 
-UNARY_TRAIT_DEFN (__is_integral);
-UNARY_TRAIT_TRUE (__is_integral, char);
+UNARY_TRAIT_DEFN (__ustl_is_integral);
+UNARY_TRAIT_TRUE (__ustl_is_integral, char);
 #if HAVE_THREE_CHAR_TYPES
-UNARY_TRAIT_TRUE (__is_integral, signed char);
+UNARY_TRAIT_TRUE (__ustl_is_integral, signed char);
 #endif
-UNARY_TRAIT_TRUE (__is_integral, short);
-UNARY_TRAIT_TRUE (__is_integral, int);
-UNARY_TRAIT_TRUE (__is_integral, long);
-UNARY_TRAIT_TRUE (__is_integral, unsigned char);
-UNARY_TRAIT_TRUE (__is_integral, unsigned short);
-UNARY_TRAIT_TRUE (__is_integral, unsigned int);
-UNARY_TRAIT_TRUE (__is_integral, unsigned long);
+UNARY_TRAIT_TRUE (__ustl_is_integral, short);
+UNARY_TRAIT_TRUE (__ustl_is_integral, int);
+UNARY_TRAIT_TRUE (__ustl_is_integral, long);
+UNARY_TRAIT_TRUE (__ustl_is_integral, unsigned char);
+UNARY_TRAIT_TRUE (__ustl_is_integral, unsigned short);
+UNARY_TRAIT_TRUE (__ustl_is_integral, unsigned int);
+UNARY_TRAIT_TRUE (__ustl_is_integral, unsigned long);
 #if HAVE_LONG_LONG
-UNARY_TRAIT_TRUE (__is_integral, long long);
-UNARY_TRAIT_TRUE (__is_integral, unsigned long long);
+UNARY_TRAIT_TRUE (__ustl_is_integral, long long);
+UNARY_TRAIT_TRUE (__ustl_is_integral, unsigned long long);
 #endif
-UNARY_TRAIT_TRUE (__is_integral, wchar_t);
-UNARY_TRAIT_TRUE (__is_integral, bool);
-UNARY_TRAIT_DEFB (is_integral, __is_integral<remove_cv_t<T>>::value);
+UNARY_TRAIT_TRUE (__ustl_is_integral, wchar_t);
+UNARY_TRAIT_TRUE (__ustl_is_integral, bool);
+UNARY_TRAIT_DEFB (is_integral, __ustl_is_integral<remove_cv_t<T>>::value);
 
-UNARY_TRAIT_DEFN (__is_floating_point);
-UNARY_TRAIT_TRUE (__is_floating_point, float);
-UNARY_TRAIT_TRUE (__is_floating_point, double);
-UNARY_TRAIT_TRUE (__is_floating_point, long double);
-UNARY_TRAIT_DEFB (is_floating_point, __is_floating_point<remove_cv_t<T>>::value);
+UNARY_TRAIT_DEFN (__ustl_is_floating_point);
+UNARY_TRAIT_TRUE (__ustl_is_floating_point, float);
+UNARY_TRAIT_TRUE (__ustl_is_floating_point, double);
+UNARY_TRAIT_TRUE (__ustl_is_floating_point, long double);
+UNARY_TRAIT_DEFB (is_floating_point, __ustl_is_floating_point<remove_cv_t<T>>::value);
 
 UNARY_TRAIT_DEFN (is_array);
 UNARY_TRAIT_DEFN (is_lvalue_reference);
@@ -153,9 +153,9 @@ template <typename T> struct is_rvalue_reference<T&&> : public true_type {};
 
 UNARY_TRAIT_DEFB (is_reference,	is_lvalue_reference<T>::value || is_rvalue_reference<T>::value);
 
-template <typename T> struct __is_pointer : public false_type {};
-template <typename T> struct __is_pointer<T*> : public true_type {};
-template <typename T> struct is_pointer : public __is_pointer<remove_cv_t<T>> {};
+template <typename T> struct __ustl_is_pointer : public false_type {};
+template <typename T> struct __ustl_is_pointer<T*> : public true_type {};
+template <typename T> struct is_pointer : public __ustl_is_pointer<remove_cv_t<T>> {};
 
 template <typename T> struct is_array<T[]> : public true_type {};
 template <typename T, size_t N> struct is_array<T[N]> : public true_type {};
@@ -164,18 +164,18 @@ UNARY_TRAIT_DEFB (is_union,	__is_union(T));
 UNARY_TRAIT_DEFB (is_class,	__is_class(T));
 UNARY_TRAIT_DEFB (is_enum,	__is_enum(T));
 
-UNARY_TRAIT_DEFN (__is_member_pointer);
-template <typename T, typename U> struct __is_member_pointer<U T::*> : public true_type {};
-UNARY_TRAIT_DEFB (is_member_pointer, __is_member_pointer<remove_cv_t<T>>::value);
+UNARY_TRAIT_DEFN (__ustl_is_member_pointer);
+template <typename T, typename U> struct __ustl_is_member_pointer<U T::*> : public true_type {};
+UNARY_TRAIT_DEFB (is_member_pointer, __ustl_is_member_pointer<remove_cv_t<T>>::value);
 
-UNARY_TRAIT_DEFN (__is_member_function_pointer);
-template <typename T, typename R> struct __is_member_function_pointer<R (T::*)(void)> : public true_type {};
-template <typename T, typename R> struct __is_member_function_pointer<R (T::*)(...)> : public true_type {};
+UNARY_TRAIT_DEFN (__ustl_is_member_function_pointer);
+template <typename T, typename R> struct __ustl_is_member_function_pointer<R (T::*)(void)> : public true_type {};
+template <typename T, typename R> struct __ustl_is_member_function_pointer<R (T::*)(...)> : public true_type {};
 template <typename T, typename R, typename... Args>
-struct __is_member_function_pointer<R (T::*)(Args...)> : public true_type {};
+struct __ustl_is_member_function_pointer<R (T::*)(Args...)> : public true_type {};
 template <typename T, typename R, typename... Args>
-struct __is_member_function_pointer<R (T::*)(Args..., ...)> : public true_type {};
-UNARY_TRAIT_DEFB (is_member_function_pointer, __is_member_function_pointer<remove_cv_t<T>>::value);
+struct __ustl_is_member_function_pointer<R (T::*)(Args..., ...)> : public true_type {};
+UNARY_TRAIT_DEFB (is_member_function_pointer, __ustl_is_member_function_pointer<remove_cv_t<T>>::value);
 
 UNARY_TRAIT_DEFB (is_member_object_pointer, is_member_pointer<T>::value && !is_member_function_pointer<T>::value);
 
@@ -183,34 +183,34 @@ UNARY_TRAIT_DEFN (is_function);
 template <typename R, typename... Args> struct is_function<R(Args...)> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) &> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) &&> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......)> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) &> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) &&> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...)> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) &> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) &&> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) const> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) const &> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) const &&> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) const> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) const &> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) const &&> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) const> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) const &> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) const &&> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) volatile> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) volatile &> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) volatile &&> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) volatile> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) volatile &> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) volatile &&> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) volatile> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) volatile &> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) volatile &&> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) const volatile> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) const volatile &> : public true_type { };
 template <typename R, typename... Args> struct is_function<R(Args...) const volatile &&> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) const volatile> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) const volatile &> : public true_type { };
-template <typename R, typename... Args> struct is_function<R(Args......) const volatile &&> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) const volatile> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) const volatile &> : public true_type { };
+template <typename R, typename... Args> struct is_function<R(Args...,...) const volatile &&> : public true_type { };
 
 UNARY_TRAIT_DEFB (is_object, !is_reference<T>::value && !is_void<T>::value && !is_function<T>::value);
 UNARY_TRAIT_DEFB (__is_referenceable, is_reference<T>::value || is_object<T>::value);
 template <typename R, typename... Args>
 struct __is_referenceable<R(Args...)> : public true_type {};
 template <typename R, typename... Args>
-struct __is_referenceable<R(Args......)> : public true_type {};
+struct __is_referenceable<R(Args...,...)> : public true_type {};
 
 //}}}-------------------------------------------------------------------
 //{{{ Composite type categories
@@ -256,17 +256,17 @@ UNARY_TRAIT_DEFB (has_nothrow_assign,		__has_nothrow_assign(T));
 UNARY_TRAIT_DEFB (has_nothrow_copy,		__has_nothrow_copy(T));
 UNARY_TRAIT_DEFB (has_nothrow_constructor,	__has_nothrow_constructor(T));
 
-UNARY_TRAIT_DEFN (__is_signed);
-UNARY_TRAIT_TRUE (__is_signed, char);
-UNARY_TRAIT_TRUE (__is_signed, wchar_t);
-UNARY_TRAIT_TRUE (__is_signed, short);
-UNARY_TRAIT_TRUE (__is_signed, int);
-UNARY_TRAIT_TRUE (__is_signed, long);
-UNARY_TRAIT_TRUE (__is_signed, float);
-UNARY_TRAIT_TRUE (__is_signed, double);
-UNARY_TRAIT_TRUE (__is_signed, long double);
-UNARY_TRAIT_TRUE (__is_signed, long long);
-UNARY_TRAIT_DEFB (is_signed, __is_signed<remove_cv_t<T>>::value);
+UNARY_TRAIT_DEFN (__ustl_is_signed);
+UNARY_TRAIT_TRUE (__ustl_is_signed, char);
+UNARY_TRAIT_TRUE (__ustl_is_signed, wchar_t);
+UNARY_TRAIT_TRUE (__ustl_is_signed, short);
+UNARY_TRAIT_TRUE (__ustl_is_signed, int);
+UNARY_TRAIT_TRUE (__ustl_is_signed, long);
+UNARY_TRAIT_TRUE (__ustl_is_signed, float);
+UNARY_TRAIT_TRUE (__ustl_is_signed, double);
+UNARY_TRAIT_TRUE (__ustl_is_signed, long double);
+UNARY_TRAIT_TRUE (__ustl_is_signed, long long);
+UNARY_TRAIT_DEFB (is_signed, __ustl_is_signed<remove_cv_t<T>>::value);
 UNARY_TRAIT_DEFB (is_unsigned, !is_signed<T>::value);
 
 template <typename T> struct alignment_of : public integral_constant<size_t, alignof(T)> {};
@@ -293,9 +293,9 @@ template <typename T, typename U> struct is_same : public false_type {};
 template <typename T> struct is_same<T,T> : public true_type {};
 
 template <typename F, typename T, bool = is_void<F>::value || is_function<T>::value || is_array<T>::value>
-class __is_convertible : public integral_constant<bool, is_void<T>::value> {};
+class __ustl_is_convertible : public integral_constant<bool, is_void<T>::value> {};
 template <typename F, typename T>
-class __is_convertible<F, T, false> {
+class __ustl_is_convertible<F, T, false> {
     template <typename TT> static void __test_aux(TT);
     template <typename FF, typename TT, typename = decltype(__test_aux<TT>(declval<FF>()))>
 					static true_type __test(int);
@@ -304,7 +304,7 @@ public:
     using type = decltype(__test<F, T>(0));
 };
 template <typename F, typename T>
-struct is_convertible : public __is_convertible<F, T>::type {};
+struct is_convertible : public __ustl_is_convertible<F, T>::type {};
 
 /// Defines a has_member_function_name template where has_member_function_name<O>::value is true when O::name exists
 /// Example: HAS_MEMBER_FUNCTION(read, void (O::*)(istream&)); has_member_function_read<vector<int>>::value == true
