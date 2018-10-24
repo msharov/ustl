@@ -26,6 +26,7 @@ void ios_base::overrun (const char* op, const char* type, uint32_t n, uint32_t p
 istream::istream (const ostream& source) noexcept
 : cmemlink (source.begin(), source.pos())
 ,_pos (0)
+, _gcount(0)
 {
 }
 
@@ -53,6 +54,7 @@ void istream::read_strz (string& str)
     const size_type strl = distance (ipos(), zp);
     str.assign (ipos(), strl);
     _pos += strl + 1;
+    _gcount = strl;
 }
 
 /// Reads at most \p n bytes into \p s.

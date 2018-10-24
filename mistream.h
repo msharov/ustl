@@ -62,9 +62,9 @@ class string;
 ///
 class istream : public cmemlink, public ios_base {
 public:
-    inline		istream (void)				: cmemlink(), _pos (0) {}
-    inline		istream (const void* p, streamsize n)	: cmemlink(p, n), _pos (0) {}
-    inline explicit	istream (const cmemlink& source)	: cmemlink (source), _pos (0) {}
+    inline		istream (void)				: cmemlink(), _pos (0), _gcount(0) {}
+    inline		istream (const void* p, streamsize n)	: cmemlink(p, n), _pos (0), _gcount(0) {}
+    inline explicit	istream (const cmemlink& source)	: cmemlink (source), _pos (0), _gcount(0) {}
     explicit		istream (const ostream& source) noexcept;
     inline iterator	end (void) const			{ return cmemlink::end(); }
     inline void		link (const void* p, streamsize n)	{ cmemlink::link (p, n); }
@@ -90,6 +90,7 @@ public:
     void		read_strz (string& str);
     streamsize		readsome (void* s, streamsize n);
     inline void		read (istream&)			{ }
+    inline size_type	gcount (void) const		{ return _gcount; }
     void		write (ostream& os) const;
     void		text_write (ostringstream& os) const;
     inline streamsize	stream_size (void) const	{ return remaining(); }
@@ -100,6 +101,8 @@ public:
     inline void		seekg (off_t p, seekdir d = beg);
 private:
     streamoff		_pos;		///< The current read position.
+protected:
+    uint32_t		_gcount;
 };
 
 //----------------------------------------------------------------------
@@ -251,6 +254,7 @@ inline void istream::swap (istream& is)
 /// Reads \p n bytes into \p buffer.
 inline void istream::read (void* buffer, size_type n)
 {
+    _gcount = 0;
 #if WANT_STREAM_BOUNDS_CHECKING
     if (!verify_remaining ("read", "binary data", n))
 	return;
@@ -259,6 +263,7 @@ inline void istream::read (void* buffer, size_type n)
 #endif
     memcpy (reinterpret_cast<value_type*>(buffer), ipos(), n);
     _pos += n;
+    _gcount = n;
 }
 
 //----------------------------------------------------------------------
